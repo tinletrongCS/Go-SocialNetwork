@@ -1,4 +1,4 @@
-# 🐢 Tho-ret-Ci-ty
+# 🐢 Tho-ret-Ci-ty 🏢🏢🏬🏬
 
 > A modern, high-performance Full-stack social network platform built for the SuperIdols community.
 

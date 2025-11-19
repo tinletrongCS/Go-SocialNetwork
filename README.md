@@ -20,6 +20,7 @@
     * Registration/Login with JWT (JSON Web Token).
     * Account activation via Email (Mailtrap/SendGrid integration).
     * Role-based Access Control (User, Moderator, Admin).
+    * Account activation from automatically-sent verification email.
 * ** Post Management:**
     * CRUD operations for posts (text-like posts sopprted).
     * Supports Optimistic Locking (Versioning) on updates to prevent data conflicts.

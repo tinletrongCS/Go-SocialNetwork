@@ -189,3 +189,36 @@ func (app *application) getUserFollowersHandler(w http.ResponseWriter, r *http.R
 		app.internalServerError(w, r, err)
 	}
 }
+
+
+// getUserFollowersHandler godoc
+//
+//	@Summary		Get following users
+//	@Description	Get list of users that current user follows
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Param			userID	path		int		true	"User ID"
+//	@Success		200		{array}		store.User
+//	@Failure		400		{object}	error
+//	@Failure		404		{object}	error
+//	@Failure		500		{object}	error
+//	@Security		ApiKeyAuth
+//	@Router			/users/{userID}/followings [get]
+func (app *application) getUserFollowingHandler(w http.ResponseWriter, r *http.Request) {
+	userID, err := strconv.ParseInt(chi.URLParam(r, "userID"), 10, 64)
+	if err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+	ctx := r.Context()
+	followers, err := app.store.Followers.GetFollowings(ctx, userID)
+	if err != nil {
+		app.internalServerError(w, r, err)
+		return 
+	}
+
+	if err := app.jsonResponse(w, http.StatusOK, followers); err != nil {
+		app.internalServerError(w, r, err)
+	}
+}

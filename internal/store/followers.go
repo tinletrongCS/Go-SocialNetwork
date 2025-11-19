@@ -48,6 +48,7 @@ func (s *FollowerStore) Unfollow(ctx context.Context, followerID, userID int64) 
 	return err
 }
 
+// Thêm tính năng xem danh sách người đang theo dõi mình
 func (s *FollowerStore) GetFollowers(ctx context.Context, userID int64) ([]User, error) {
 	query := `
 		SELECT u.id, u.username, u.is_active
@@ -82,3 +83,42 @@ func (s *FollowerStore) GetFollowers(ctx context.Context, userID int64) ([]User,
 
 	return followers, nil
 }
+
+// Thêm tính năng lấy ra danh sách người mà người dùng hiện tại đang theo dõi 
+func (s *FollowerStore) GetFollowings(ctx context.Context, userID int64) ([]User, error) {
+	query := `
+		SELECT u1.id, u1.username, u1.is_active
+		FROM users u
+		JOIN followers f ON u.id = f.user_id
+		JOIN users u1 ON u1.id = f.follower_id
+		WHERE f.user_id = $1
+		ORDER BY f.created_at DESC
+	`
+
+	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	defer cancel()
+
+	rows, err := s.db.QueryContext(ctx, query, userID)
+
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var followings []User
+	for rows.Next() {
+		var user User
+		err := rows.Scan(
+			&user.ID,
+			&user.Username,
+			&user.IsActive,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+
+		followings = append(followings, user)
+	}
+
+	return followings, nil 
+} 

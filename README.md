@@ -1,4 +1,4 @@
-# 🐹 GopherSocial
+# 🐢 Tho-ret-Ci-ty
 
 > A modern, high-performance Full-stack social network platform built for the Gophers community.
 
@@ -12,7 +12,7 @@
 
 ## 📖 Introduction
 
-**GopherSocial** is an open-source project simulating the core features of a social network. The project is designed with a Layered Architecture, focusing on clarity, scalability, and performance. It demonstrates modern Backend techniques such as Database Transactions, Caching, Rate Limiting, and Asynchronous Processing.
+**Tho-ret-Ci-ty** is an open-source project simulating the core features of a social network. The project is designed with a Layered Architecture, focusing on clarity, scalability, and performance. It demonstrates modern Backend techniques such as Database Transactions, Caching, Rate Limiting, and Asynchronous Processing.
 
 ## ✨ Features
 
@@ -80,6 +80,6 @@ export REDIS_ADDR=localhost:6379
 export REDIS_ENABLED=true
 
 # Email Configuration (Get from Mailtrap.io -> Email Testing -> Inboxes)
-export FROM_EMAIL=test@gophersocial.com
+export FROM_EMAIL=test@Tho-ret-Ci-ty.com
 export MAILTRAP_USER=your_mailtrap_username
 export MAILTRAP_PASS=your_mailtrap_password

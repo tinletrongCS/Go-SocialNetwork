@@ -16,24 +16,24 @@
 
 ## Features
 
-* ** Authentication & Authorization:**
-    * Registration/Login with JWT (JSON Web Token).
-    * Role-based Access Control (User, Moderator, Admin).
-    * Account activation via Email(Mailtrap/SendGrid integration).
-* ** Post Management:**
-    * CRUD operations for posts (text-like posts sopprted).
-    * Supports Optimistic Locking (Versioning) on updates to prevent data conflicts.
-* ** Social Interaction:**
-    * Comment system.
-    * Follow and Unfollow users.
-    * *(Coming Soon)* Like posts.
-* ** News Feed:**
-    * Aggregated feed of posts from followed users.
-    * Supports Pagination, Search, and Filtering by Tags.
-* ** Security & Performance:**
-    * Rate Limiting to prevent abuse/spam.
-    * Redis Caching for user information to reduce Database load.
-    * Graceful Shutdown.
+### Authentication & Authorization: 
+   * Registration/Login with JWT (JSON Web Token).
+   * Role-based Access Control (User, Moderator, Admin).
+   * Account activation via Email(Mailtrap/SendGrid integration).
+### Post Management:
+   * CRUD operations for posts (text-like posts sopprted).
+   * Supports Optimistic Locking (Versioning) on updates to prevent data conflicts.
+### Social Interaction:
+   * Comment system.
+   * Follow and Unfollow users.
+   * *(Coming Soon)* Like posts.
+### News Feed:
+   * Aggregated feed of posts from followed users.
+   * Supports Pagination, Search, and Filtering by Tags.
+### Security & Performance:
+   * Rate Limiting to prevent abuse/spam.
+   * Redis Caching for user information to reduce Database load.
+   * Graceful Shutdown.
 
 ##  Tech Stack
 

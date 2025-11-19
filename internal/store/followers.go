@@ -47,3 +47,38 @@ func (s *FollowerStore) Unfollow(ctx context.Context, followerID, userID int64) 
 	_, err := s.db.ExecContext(ctx, query, userID, followerID)
 	return err
 }
+
+func (s *FollowerStore) GetFollowers(ctx context.Context, userID int64) ([]User, error) {
+	query := `
+		SELECT u.id, u.username, u.is_active
+		FROM users u
+		JOIN followers f ON u.id = f.user_id
+		WHERE f.follower_id = $1
+		ORDER BY f.created_at DESC
+	`
+	ctx, cancel := context.WithTimeout(ctx,QueryTimeoutDuration)
+	defer cancel()
+
+	rows, err := s.db.QueryContext(ctx, query, userID)
+
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var followers []User
+	for rows.Next() {
+		var user User 
+		err := rows.Scan(
+			&user.ID,
+			&user.Username,
+			&user.IsActive,
+		)
+		if err != nil {
+			return nil, err
+		}
+		followers = append(followers, user)
+	}
+
+	return followers, nil
+}

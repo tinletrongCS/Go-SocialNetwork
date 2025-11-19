@@ -7,7 +7,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"time"
-
+	"log"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -93,11 +93,18 @@ func (s *UserStore) Create(ctx context.Context, tx *sql.Tx, user *User) error {
 }
 
 func (s *UserStore) GetByID(ctx context.Context, userID int64) (*User, error) {
+	// query := `
+	// 	SELECT users.id, username, email, password, created_at, users.is_active, roles.*
+	// 	FROM users
+	// 	JOIN roles ON (users.role_id = roles.id)
+	// 	WHERE users.id = $1 AND is_active = true
+	// `
+
 	query := `
-		SELECT users.id, username, email, password, created_at, roles.*
+		SELECT users.id, username, email, password, created_at, users.is_active,users.role_id, roles.*
 		FROM users
 		JOIN roles ON (users.role_id = roles.id)
-		WHERE users.id = $1 AND is_active = true
+		WHERE users.id = $1 AND users.is_active = true
 	`
 
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
@@ -114,7 +121,9 @@ func (s *UserStore) GetByID(ctx context.Context, userID int64) (*User, error) {
 		&user.Email,
 		&user.Password.hash,
 		&user.CreatedAt,
-		&user.Role.ID,
+		&user.IsActive, // Ban đầu thiếu chỗ này nên nó mới không áp vào Struct 
+		&user.RoleID,
+		&user.Role.ID, 
 		&user.Role.Name,
 		&user.Role.Level,
 		&user.Role.Description,
@@ -154,6 +163,7 @@ func (s *UserStore) Activate(ctx context.Context, token string) error {
 		}
 
 		// 2. update the user
+		log.Printf("Set IsActive to true")
 		user.IsActive = true
 		if err := s.update(ctx, tx, user); err != nil {
 			return err

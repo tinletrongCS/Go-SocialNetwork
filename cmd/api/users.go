@@ -138,7 +138,7 @@ func (app *application) unfollowUserHandler(w http.ResponseWriter, r *http.Reque
 func (app *application) activateUserHandler(w http.ResponseWriter, r *http.Request) {
 	token := chi.URLParam(r, "token")
 
-	err := app.store.Users.Activate(r.Context(), token) // -> call  to store/users.go
+	err := app.store.Users.Activate(r.Context(), token) // -> call to store/users.go
 	if err != nil {
 		switch err {
 		case store.ErrNotFound:
@@ -157,4 +157,35 @@ func (app *application) activateUserHandler(w http.ResponseWriter, r *http.Reque
 func getUserFromContext(r *http.Request) *store.User {
 	user, _ := r.Context().Value(userCtx).(*store.User)
 	return user
+}
+// getUserFollowersHandler godoc
+//
+//	@Summary		Get user followers
+//	@Description	Get list of users following the specified user
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Param			userID	path		int		true	"User ID"
+//	@Success		200		{array}		store.User
+//	@Failure		400		{object}	error
+//	@Failure		404		{object}	error
+//	@Failure		500		{object}	error
+//	@Security		ApiKeyAuth
+//	@Router			/users/{userID}/followers [get]
+func (app *application) getUserFollowersHandler(w http.ResponseWriter, r *http.Request) {
+	userID, err := strconv.ParseInt(chi.URLParam(r, "userID"), 10, 64)
+	if err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+	ctx := r.Context()
+	followers, err := app.store.Followers.GetFollowers(ctx, userID)
+	if err != nil {
+		app.internalServerError(w, r, err)
+		return 
+	}
+
+	if err := app.jsonResponse(w, http.StatusOK, followers); err != nil {
+		app.internalServerError(w, r, err)
+	}
 }

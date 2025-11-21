@@ -1,27 +1,29 @@
-import { useNavigate, useParams } from "react-router-dom"
-import { API_URL } from "./App"
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { fetcher } from "./api";
 
 export const ConfirmationPage = () => {
-  const { token = '' } = useParams()
-  const redirect = useNavigate()
+  const { token = '' } = useParams();
+  const navigate = useNavigate();
+  const [status, setStatus] = useState("Đang kích hoạt...");
 
-  const handleConfirm = async () => {
-    const response = await fetch(`${API_URL}/users/activate/${token}`, {
-      method: "PUT"
-    })
-
-    if (response.ok) {
-      redirect("/")
-    } else {
-      // handle error
-      alert("Failed to confirm token")
-    }
-  }
+  useEffect(() => {
+    const activateAccount = async () => {
+      try {
+        await fetcher(`/users/activate/${token}`, { method: "PUT" });
+        setStatus("Kích hoạt thành công! Đang chuyển hướng...");
+        setTimeout(() => navigate("/auth"), 2000);
+      } catch (error) {
+        setStatus("Kích hoạt thất bại hoặc token đã hết hạn.");
+      }
+    };
+    activateAccount();
+  }, [token, navigate]);
 
   return (
-    <div>
-      <h1>Confirmation</h1>
-      <button onClick={handleConfirm}>Click to confirm</button>
+    <div className="container" style={{ textAlign: "center", marginTop: "100px" }}>
+      <h2>{status}</h2>
+      <button className="btn" onClick={() => navigate("/auth")}>Quay lại đăng nhập</button>
     </div>
-  )
-}
+  );
+};

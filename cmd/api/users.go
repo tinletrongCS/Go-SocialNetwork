@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -178,8 +179,7 @@ func (app *application) getUserFollowersHandler(w http.ResponseWriter, r *http.R
 		app.badRequestResponse(w, r, err)
 		return
 	}
-	ctx := r.Context()
-	followers, err := app.store.Followers.GetFollowers(ctx, userID)
+	followers, err := app.store.Followers.GetFollowers(r.Context(), userID)
 	if err != nil {
 		app.internalServerError(w, r, err)
 		return 
@@ -211,14 +211,36 @@ func (app *application) getUserFollowingHandler(w http.ResponseWriter, r *http.R
 		app.badRequestResponse(w, r, err)
 		return
 	}
-	ctx := r.Context()
-	followers, err := app.store.Followers.GetFollowings(ctx, userID)
+	followers, err := app.store.Followers.GetFollowings(r.Context(), userID)
 	if err != nil {
 		app.internalServerError(w, r, err)
 		return 
 	}
 
 	if err := app.jsonResponse(w, http.StatusOK, followers); err != nil {
+		app.internalServerError(w, r, err)
+	}
+}
+
+func (app *application) searchUserHandler(w http.ResponseWriter, r *http.Request) {
+	// Ở cái layer này thì chỉ làm các nhiệm vụ
+	// - Lấy param hoặc query trên URL từ request nếu có 
+	// - Quăng ra các ngoại lệ nếu có
+	// - Gọi các hàm ở trong store, những hàm đó mói thực sự lấy dữ liệu từ DB 
+	query := r.URL.Query().Get("q")
+	if query == "" {
+		app.badRequestResponse(w, r, fmt.Errorf("query is required"))
+		return
+	}
+
+	currentuser := getUserFromContext(r)
+	users, err := app.store.Users.Search(r.Context(), query, currentuser.ID)
+	if err != nil {
+		app.internalServerError(w, r, err)
+		return
+	}
+
+	if err := app.jsonResponse(w, http.StatusOK, users); err != nil {
 		app.internalServerError(w, r, err)
 	}
 }

@@ -17,14 +17,15 @@ var (
 )
 
 type User struct {
-	ID        int64    `json:"id"`
-	Username  string   `json:"username"`
-	Email     string   `json:"email"`
-	Password  password `json:"-"`
-	CreatedAt string   `json:"created_at"`
-	IsActive  bool     `json:"is_active"`
-	RoleID    int64    `json:"role_id"`
-	Role      Role     `json:"role"`
+	ID        	int64    `json:"id"`
+	Username  	string   `json:"username"`
+	Email     	string   `json:"email"`
+	Password  	password `json:"-"`
+	CreatedAt 	string   `json:"created_at"`
+	IsActive  	bool     `json:"is_active"`
+	RoleID    	int64    `json:"role_id"`
+	Role      	Role     `json:"role"`
+	IsFollowing bool   	 `json:"is_following"`
 }
 
 type password struct {
@@ -284,8 +285,8 @@ func (s *UserStore) delete(ctx context.Context, tx *sql.Tx, id int64) error {
 
 func (s *UserStore) GetByEmail(ctx context.Context, email string) (*User, error) {
 	query := `
-		SELECT id, username, emaicl, password, created_at FROM users
-		WHERE email = $1 AND is_ative = true
+		SELECT id, username, email, password, created_at FROM users
+		WHERE email = $1 AND is_active = true
 	`
 
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
@@ -310,3 +311,44 @@ func (s *UserStore) GetByEmail(ctx context.Context, email string) (*User, error)
 
 	return user, nil
 }
+
+func (s *UserStore) Search(ctx context.Context, username string, followerID int64) ([]User, error) {
+	query := `
+		SELECT u.id, u.username, u.email,
+		EXISTS (
+			SELECT 1 
+			FROM followers f
+			WHERE f.user_id = $2 AND f.follower_id = u.id
+		) AS is_following
+		FROM users u
+		WHERE u.username ILIKE '%' || $1 || '%' AND is_active = true AND u.id != $2
+		ORDER BY u.username ASC
+		LIMIT 20 
+	`
+
+	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	defer cancel()
+	rows, err := s.db.QueryContext(ctx, query, username, followerID)
+	if err != nil {
+		return nil, err
+	}
+
+	var users []User
+	for rows.Next() {
+		var user User
+		err := rows.Scan(
+			&user.ID,
+			&user.Username,
+			&user.Email,
+			&user.IsFollowing,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+
+		users = append(users, user)
+	}
+
+	return users, nil
+}	

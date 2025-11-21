@@ -37,3 +37,7 @@ func (m *MockUserStore) Activate(ctx context.Context, t string) error {
 func (m *MockUserStore) Delete(ctx context.Context, id int64) error {
 	return nil
 }
+
+func (m *MockUserStore) Search(ctx context.Context, username string,followerID int64) ([]User, error) {
+	return nil, nil
+}

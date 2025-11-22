@@ -21,7 +21,7 @@
    * Role-based Access Control (User, Moderator, Admin).
    * Account activation via Email(Mailtrap/SendGrid integration).
 ### Post Management:
-   * CRUD operations for posts (text-like posts sopprted).
+   * CRUD operations for posts (text-like posts supported).
    * Supports Optimistic Locking (Versioning) on updates to prevent data conflicts.
 ### Social Interaction:
    * Comment system.
